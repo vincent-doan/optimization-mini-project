@@ -36,13 +36,16 @@ assert len(classroom_seats) == M
 def c(classroom): # classroom capacity
     return classroom_seats[classroom - 1]
 
-periods_list = [(session, period) for session in range(1,11) for period in range(1,7)] # session: Monday morning to Friday afternoon
+periods_list = [(session, period) for session in range(1,11) for period in range(1,7)] # session: Monday morning to Friday afternoon. total of 10 sessions
 
-# a slot represents some time and some classroom
+# a slot represents some time (time = session + period) and some classroom
 all_slots = [(time, classroom) for classroom in classrooms_list for time in periods_list]
+# boolean list to check whether a course has been assigned yet. N = total number of courses
 check_added = [False] * N
+# dictionary where key = slot (slot = time + classroom), value = course
 filled_slots = defaultdict(int)
 
+# format printing of filled_slots
 def print_filled_slots(filled_slots):
     filled_slots_sorted = list()
     for (((session, period), classroom), course) in filled_slots.items():
@@ -62,7 +65,7 @@ def Backtracking(course):
             continue
         if sum([g(filled_slots[time, room]) == g(course) for room in classrooms_list]) > 0: # one professor appears in two classrooms at once
             continue
-        if check_added[course - 1] == True:
+        if check_added[course - 1] == True: # a course has already been assigned
             continue
 
         index = periods_list.index(time)
