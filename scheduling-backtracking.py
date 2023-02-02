@@ -76,6 +76,7 @@ def Backtracking(course):
         
         if course == N:
             print_filled_slots(filled_slots)
+            print('---')
         else:
             Backtracking(course + 1)
 
