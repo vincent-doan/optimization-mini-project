@@ -1,22 +1,24 @@
-CONVERT_SESSION = {1:"Monday morning", 
-2:"Monday afternoon", 
-3:"Tuesday morning", 
-4:"Tuesday afternoon",
-5:"Wednesday morning",
-6:"Wednesday afternoon",
-7:"Thursday morning",
-8:"Thursday afternoon",
-9:"Friday morning",
-10:"Friday afternoon"}
+from convert import *
+from generate_input import *
 
-# input
-N, M = tuple(map(int, input().split()))
+N = int(input('Enter number of courses (N): '))
+M = int(input('Enter number of classrooms (M): '))
+generate_input(N, M, 1)
+
 courses_info = dict()
 professors_list = list()
-for i in range(1, N + 1):
-    t, g, s = tuple(map(int, input().split()))
-    professors_list.append(g)
-    courses_info[i] = (t, g, s)
+classrooms_list = list(range(1, M + 1))
+classroom_seats = list()
+
+with open("input.txt", 'r') as fp:
+    for index, line in enumerate(fp.readlines()):
+        if index == 0: continue
+        if index == N+1:
+            classroom_seats = list(map(int, line.rstrip().split(' ')))
+            continue
+        t, g, s = tuple(map(int, line.rstrip().split(' ')))
+        professors_list.append(g)
+        courses_info[index] = (t, g, s)
 
 def t(course): # number of periods
     return courses_info[course][0]
@@ -26,11 +28,6 @@ def g(course): # course professor
     return courses_info[course][1]
 def s(course): # number of students
     return courses_info[course][2]
-
-classrooms_list = list(range(1, M + 1))
-classroom_seats = list(map(int, input().split()))
-assert len(classroom_seats) == M
-
 def c(classroom): # classroom capacity
     return classroom_seats[classroom - 1]
 
@@ -55,8 +52,21 @@ def print_timetable(timetable):
     timetable_sorted.sort(key=lambda t: (t[0], t[2], t[1], t[3]))
     for (session, period, classroom, course) in timetable_sorted:
         if course == 0: continue
-        print(CONVERT_SESSION[session] + " - Period " + str(period) + " - Classroom " + str(classroom) + \
+        print(convert_session(session) + " - Period " + str(period) + " - Classroom " + str(classroom) + \
             ' (' + str(c(classroom)) + ')' + ": Course " + str(course) + " " + str(courses_info[course]))
+
+def export_timetable(timetable):
+    with open("output.txt",'w') as fp:
+        timetable_sorted = list()
+        for (index, slot) in enumerate(timetable):
+            course = index + 1
+            timetable_sorted.append((slot[0], slot[1], slot[1]+t(course)-1, course, convert_prof(courses_info[course][1]), s(course), slot[2], c(slot[2])))
+        timetable_sorted.sort(key=lambda t: (t[0], t[-2], t[1], t[3]))
+        for index, entry in enumerate(timetable_sorted):
+            entry_string = '-'.join(list(map(str, entry)))
+            fp.write(entry_string)
+            if index != len(timetable_sorted) - 1:
+                fp.write('\n')
 
 solution_obtained = [False]
 
@@ -102,6 +112,7 @@ def Assign(course):
 
         if course == N:
             print_timetable(timetable)
+            export_timetable(timetable)
             solution_obtained[0] = True
         else:
             Assign(course + 1)
