@@ -78,14 +78,14 @@ def update_all_slots(course):
     updated_all_slots.sort(key = lambda t: c(t[2]))
     return updated_all_slots
 
-solution_obtained = [False]
-
 def Assign(course):
 
+    if course == N+1:
+        print_timetable(timetable)
+        export_timetable(timetable)
+        return True
+
     for slot in update_all_slots(course):
-        # only need one solution
-        if solution_obtained[0] == True:
-            continue
         
         # there are not enough periods left in a session to cover the entire class
         if (6 - slot[1] + 1) < t(course): 
@@ -120,11 +120,9 @@ def Assign(course):
     
         timetable[course - 1] = slot
 
-        if course == N:
-            print_timetable(timetable)
-            export_timetable(timetable)         
-            solution_obtained[0] = True
-        else:
-            Assign(course + 1)
+        if Assign(course + 1):
+            return True
+    
+    return False
 
 Assign(1)
