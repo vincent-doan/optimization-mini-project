@@ -54,7 +54,7 @@ def print_timetable(assignments):
         for i in range(classes[index]['duration']):
             next = next_slot(slot,i)
             timetable_sorted.append((next[0], next[1], next[2]['classroom_name'], classes[index]['class_name']))
-    timetable_sorted.sort(key=lambda t: (t[0], t[2], t[1], t[3]))
+    timetable_sorted.sort(key=lambda t: (t[0], t[2], t[3], t[1]))
     for (session, period, classroom, course) in timetable_sorted:
         if course == 0: continue
         (t, g, s) = (classes[course - 1]['duration'], classes[course - 1]['professor'], classes[course - 1]['no_students'])
@@ -105,6 +105,8 @@ def assign(current_index):
         return True
     
     for slot in classes[current_index]['domain']:
+        if (6 - slot[1] + 1) < classes[current_index]['duration']: 
+            continue
         for class_ in classes:
             if len(class_['domain']) == 0:
                 return False
@@ -113,6 +115,8 @@ def assign(current_index):
         if assign(current_index + 1):
             return True
         # reverting changes to the unassigned domains once the algorithm backtracks
+        # re-sort the domain after reverting changes
+        assignments.pop()
         for index in range(current_index + 1, N):
             classes[index]['domain'].extend(deleted[index])
             classes[index]['domain'].sort(key = lambda t: t[2]['capacity'])
