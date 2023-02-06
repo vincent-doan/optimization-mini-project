@@ -56,7 +56,7 @@ def print_timetable(timetable):
             ' (' + str(c(classroom)) + ')' + ": Course " + str(course) + " " + str(courses_info[course]))
 
 def export_timetable(timetable):
-    with open("output_variable_ordering.txt",'w') as fp:
+    with open("output_value_ordering.txt",'w') as fp:
         timetable_sorted = list()
         for (index, slot) in enumerate(timetable):
             course = index + 1
