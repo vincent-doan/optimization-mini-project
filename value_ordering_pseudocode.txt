@@ -1,0 +1,30 @@
+# class: class.duration, class.professor, class.no_students
+# classroom: classroom.capacity
+
+SET (all_classes, all_classrooms) = read_input()
+
+SET all_slots = [(slot.session, slot.period, slot.classroom) 
+                FOR session from Monday morning to Friday afternoon
+                FOR period from 1 to 6
+                FOR classroom from 1 to M]
+
+SET timetable = [] * N
+
+FUNCTION reorder_slots(all_slots, class):
+    remove_insufficient_capacity_slots(all_slots, class.no_students)
+    sort_slots_by_increasing_capacity(all_slots)
+    RETURN all_slots
+
+FUNCTION assign(class):
+    FOR slot in reorder_slots(all_slots, class):
+        if slot_is_taken(timetable, slot): CONTINUE
+        if not_enough_periods_left_in_session(class.duration, slot.period): CONTINUE
+        if duplicate_prof(timetable, class.professor): CONTINUE
+        
+        timetable[class] <- slot
+
+        IF all_classes_assigned:
+            break_recursive_calls()
+END FUNCTION
+
+assign(class <- 1)
